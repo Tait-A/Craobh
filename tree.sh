@@ -25,6 +25,7 @@ fi
 print_tree() {
     local directory=$1
     local cur_level=$2
+    local prev_prefix=$3
 
     if [ $cur_level -gt $levels ]; then
         return
@@ -33,6 +34,12 @@ print_tree() {
     local prefix=$(printf "%*s" $((((cur_level - 1)) * 4)) "")
 
     for entry in "$directory"/*; do
+        if #is last in $directory then
+            local dir_prefix="${prefix}└──"
+        else
+            local dir_prefix="${prefix}├──"
+        fi
+        local dir_prefix =
         if [ -d "$entry" ]; then
             echo "${prefix}├──$(basename "$entry")"
             print_tree "$entry" $((cur_level + 1))
