@@ -1,10 +1,6 @@
 #!/bin/bash
-
-# This script will print the directory tree of the current directory
-
-
 ### ARGUMENT PROCESSING ###
-levels=2
+levels=4
 
 while getopts "l:" opt; do
     case "${opt}" in
@@ -32,26 +28,31 @@ print_tree() {
     local cur_prefix=$3
 
     if [ $cur_level -gt $levels ]; then
+        echo "$levels"
+        echo "$cur_level"
         return
     fi
 
-    local prefix=$(printf "%*s" $((((cur_level - 1)) * 4)) "")
-    local files = ($(ls -a "$directory"))
+    local files=($(ls "$directory"))
+    local no_dirs=(${#files[@]})
+    local let i=0
 
-    for ((i=0; i<${#files[@]}; i++)); do
-        local entry = $files[i]
-        if $i == ${#files[@]} - 1; then
-            dir_prefix="${prefix}└──"
+    for ((i=0; i<no_dirs; i++)); do
+        local entry=${files[$i]}  
+
+        if ((i+1 == $no_dirs)); then            
+            local dir_prefix="${cur_prefix}└── "
             local next_prefix="${cur_prefix}    "
-        else
-            dir_prefix="${prefix}├──"
+        else    
+            local dir_prefix="${cur_prefix}├── "
             local next_prefix="${cur_prefix}│   "
         fi
+
         if [ -d "$entry" ]; then
             echo "${dir_prefix}$(basename "$entry")"
             print_tree "$entry" $((cur_level + 1)) "$next_prefix"
         else
-            echo "${prefix}$(basename "$entry")"
+            echo "${dir_prefix}$(basename "$entry")"
         fi
     done
 }
